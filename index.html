@@ -167,19 +167,20 @@
             for (klass in group) {
               group[klass].corrected = false;
             }
-            c.corrected = true
-            // update the journal output
-            var names = shuffle(this.journals.map(c => c.Journal))
-            var confidences = Array.from({ length: names.length }, () => ((Math.random() * 0.4) + 0.5).toFixed(2)).sort().reverse();
-            for (index in names) {
-              this.journals[index].Journal = names[index];
-              this.journals[index].ConfidenceScore = confidences[index];
+            // update the journal output if we are changing a prediction
+            if (!c.predicted) {
+              var names = shuffle(this.journals.map(c => c.Journal))
+              var confidences = Array.from({ length: names.length }, () => ((Math.random() * 0.4) + 0.5).toFixed(2)).sort().reverse();
+              for (index in names) {
+                this.journals[index].Journal = names[index];
+                this.journals[index].ConfidenceScore = confidences[index];
+              }
             }
-            //this.journals = shuffle(this.journals.slice())
+            c.corrected = true
+            c.predicted = false // not ideal but just a demo
           },
           variant(klasses, klass) {
-            var anyCorrected = klasses.filter(k=>k.corrected).length > 0
-            return klass.corrected ? 'success' : !anyCorrected && klass.predicted ? 'info' : ''
+            return klass.corrected ? 'success' : klass.predicted ? 'info' : ''
           }
         },
         created: function() {
