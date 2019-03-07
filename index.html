@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+    <title>Article Transfer</title>
+
+    <!-- Required Stylesheets -->
+    <link
+      type="text/css"
+      rel="stylesheet"
+      href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css"
+    />
+    <link
+      type="text/css"
+      rel="stylesheet"
+      href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"
+    />
+    <style>
+      .heading {padding: 1rem;}
+    </style>
+    <!-- Required scripts -->
+    <script src="https://unpkg.com/vue"></script>
+    <script src="https://unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+  </head>
+  <body>
+    <!-- Our application root element -->
+    <div id="app">
+      <b-container>
+        <div class="results" v-if="stage == 'form'">
+        <b-jumbotron class="heading" header="Article Transfer" lead="Enter S1 submission id">
+        </b-jumbotron>
+            <b-form >
+              <b-form-group id="exampleInputGroup1" label="Submission identifier:" label-for="exampleInput1"
+                description="The identifier to be used to locate the article in the S1 submission service">
+                <b-form-input id="exampleInput1" type="text" required placeholder="XXXXX-NNNNN" />
+              </b-form-group>
+            
+              <b-button type="submit" v-on:click="stage = 'results'" variant="primary">Submit</b-button>
+            </b-form>
+        </div>
+        <div class="results"  v-if="stage == 'results'">
+        <b-jumbotron class="heading" header="Article Transfer" lead="Transfer journal recommendations">
+        </b-jumbotron>
+        <div class="row">
+          <div class="col-sm">
+          <div class="card">
+            <div class="card-header">
+              Submitted article details
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Effects of non-Newtonian gravity on the properties of strange stars</h5>
+              <p class="card-text">The properties of strange star matter are studied in the equivparticle model with inclusion of non-Newtonian gravity.
+              It
+              is found that the inclusion of non-Newtonian gravity makes the equation of state stiffer if Witten’s conjecture is
+              true.
+              Correspondingly, the maximum mass of strange stars becomes as large as two times the solar mass, and the maximum
+              radius
+              also becomes bigger. The coupling to boson mass ratio has been constrained within the stability range of strange quark
+              matter. Sloan Digital Sky Survey IV: Mapping the Milky Way, nearby galaxies, and the distant universe We describe the
+              Sloan Digital Sky Survey IV (SDSS-IV), a project encompassing three major spectroscopic programs. The Apache Point
+              Observatory Galactic Evolution Experiment 2 (APOGEE-2) is observing hundreds of thousands of Milky Way stars at high
+              resolution and high signal-to-noise ratios in the near-infrared.</p>
+            </div>
+          </div>
+          </div>
+          <div class="col-sm">
+          <div class="card">
+            <div class="card-header">
+              Classification results
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Please select a more appropriate classification if the results shown are not correct.</h5>
+              <dl>
+                <dt>Subject</dt>
+                <dd>
+                  <b-button class="mx-1 my-1" size="sm" :variant="variant(subject)" v-on:click="applyCorrection(subjects, subject)"
+                    v-for="subject in subjects">
+                    {{ subject.name }}
+                  </b-button>
+                </dd>
+                <dt>Domain</dt>
+                <dd>
+                  <b-button class="mx-1 my-1" size="sm" :variant="variant(domain)" v-on:click="applyCorrection(domains, domain)"
+                    v-for="domain in domains">
+                    {{ domain.name }}
+                  </b-button>
+                </dd>
+              </dl>
+            </div>
+          </div>
+          </div>
+        </div>
+          <div class="row my-3">
+            <div class="col-sm">
+            <div class="card">
+              <div class="card-header">
+                Recommended Journals
+              </div>
+              <div class="card-body">
+                <h5 class="card-title">Select the most appropriate journal and click confirm to submit your feedback.</h5>
+                <b-table striped hover :items="journals" selectable select-mode="single" selected-variant="success">
+                </b-table>
+                <b-button variant="success" v-on:click="stage = 'confirm'">Submit</b-button>
+                <b-button  v-on:click="stage = 'form'">Cancel</b-button>
+              </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="thanks" v-if="stage == 'confirm'" >
+        <b-jumbotron class="heading" header="Article Transfer" lead="Thanks for your feedback">
+          <b-button v-on:click="stage = 'form'">Play again?</b-button>
+        </b-jumbotron>
+        </div>
+      </b-container>
+    </div>
+
+    <!-- Start running your app -->
+    <script>
+      window.app = new Vue({
+        el: '#app',
+        data: {
+          stage: "form",
+          subjects: [],
+          domains: [],
+          journals: [
+            { Journal: "ACS Nano", ConfidenceScore: 0.90 },
+            { Journal: "Advanced Functional Materials", ConfidenceScore: 0.85 },
+            { Journal: "Advanced Materials", ConfidenceScore: 0.75 },
+            { Journal: "Nature Photonics", ConfidenceScore: 0.69 },
+            { Journal: "Nanoscale", ConfidenceScore: 0.61 },
+          ]
+        },
+        methods: {
+          applyCorrection(group, c) {
+            for (klass in group) {
+              group[klass].corrected = false;
+            }
+            c.corrected = true
+          },
+          variant(klass) {
+            return klass.corrected ? 'success' : klass.predicted ? 'info' : ''
+          }
+        },
+        computed: {
+        },
+        created: function() {
+          this.subjects = ["Soft matter", "Nanomaterial synthesis", "Semiconductor nanodevices", "Multiferroics", "Topological insulators", "High pressure physics", "Plasmonics Sensing", "Liquids", "Self assembled materials", "Electron transport in CMP", "Plasmonic metamaterials", "Computational Methods in CMP", "Spintronics" ].map(n => ({name: n, predicted: false, corrected: false}))
+          this.subjects[0].predicted = true;
+          this.domains = ["Applied", "Theoretical"].map(n => ({ name: n, predicted: false, corrected: false }))
+          this.domains[1].predicted = true;
+        }
+      })
+    </script>
+  </body>
+</html>
