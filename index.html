@@ -32,10 +32,10 @@
     <div id="app">
       <b-container>
         <div class="results" v-if="stage == 'form'">
-        <b-jumbotron class="heading" header="Article Transfer" lead="Please enter an S1 identifier to begin">
+        <b-jumbotron class="heading" header="Article Transfer" lead="Decision support assistant">
         </b-jumbotron>
             <b-form >
-              <b-form-group id="exampleInputGroup1" label="Submission identifier:" label-for="exampleInput1"
+              <b-form-group id="exampleInputGroup1" label="Please enter an S1 identifier to begin:" label-for="exampleInput1"
                 description="The identifier to be used to locate the article in the S1 submission service">
                 <b-form-input id="exampleInput1" type="text" required placeholder="XXXXX-NNNNN" />
               </b-form-group>
@@ -44,7 +44,7 @@
             </b-form>
         </div>
         <div class="results"  v-if="stage == 'results'">
-        <b-jumbotron class="heading" header="Article Transfer" lead="Transfer journal recommendations">
+        <b-jumbotron class="heading" header="Article Transfer" lead="Decision support assistant">
         </b-jumbotron>
         <div class="row">
           <div class="col-sm">
@@ -74,18 +74,19 @@
               Classification results
             </div>
             <div class="card-body">
-              <h5 class="card-title">Please select a more appropriate classification if the results shown are not correct.</h5>
+              <h5 class="card-title">Please click to validate correct classifications or select a more appropriate classification if the results shown are
+              not correct.</h5>
               <dl>
                 <dt>Subject</dt>
                 <dd>
-                  <b-button class="mx-1 my-1" size="sm" :variant="variant(subject)" v-on:click="applyCorrection(subjects, subject)"
+                  <b-button class="mx-1 my-1" size="sm" :variant="variant(subjects, subject)" v-on:click="applyCorrection(subjects, subject)"
                     v-for="subject in subjects">
                     {{ subject.name }}
                   </b-button>
                 </dd>
                 <dt>Domain</dt>
                 <dd>
-                  <b-button class="mx-1 my-1" size="sm" :variant="variant(domain)" v-on:click="applyCorrection(domains, domain)"
+                  <b-button class="mx-1 my-1" size="sm" :variant="variant(domains, domain)" v-on:click="applyCorrection(domains, domain)"
                     v-for="domain in domains">
                     {{ domain.name }}
                   </b-button>
@@ -113,7 +114,8 @@
           </div>
         </div>
         <div class="thanks" v-if="stage == 'confirm'" >
-        <b-jumbotron class="heading" header="Article Transfer" lead="Thanks for your feedback">
+        <b-jumbotron class="heading" header="Article Transfer" lead="Decision support assistant">
+          <h5>Thanks for your feedback</h5>
           <b-button v-on:click="stage = 'form'">Play again?</b-button>
         </b-jumbotron>
         </div>
@@ -122,6 +124,27 @@
 
     <!-- Start running your app -->
     <script>
+      var shuffle = function (array) {
+
+          var currentIndex = array.length;
+          var temporaryValue, randomIndex;
+
+          // While there remain elements to shuffle...
+          while (0 !== currentIndex) {
+            // Pick a remaining element...
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex -= 1;
+
+            // And swap it with the current element.
+            temporaryValue = array[currentIndex];
+            array[currentIndex] = array[randomIndex];
+            array[randomIndex] = temporaryValue;
+          }
+
+          return array;
+
+        };
+
       window.app = new Vue({
         el: '#app',
         data: {
@@ -142,12 +165,19 @@
               group[klass].corrected = false;
             }
             c.corrected = true
+            // update the journal output
+            var names = shuffle(this.journals.map(c => c.Journal))
+            var confidences = Array.from({ length: names.length }, () => ((Math.random() * 0.4) + 0.5).toFixed(2)).sort().reverse();
+            for (index in names) {
+              this.journals[index].Journal = names[index];
+              this.journals[index].ConfidenceScore = confidences[index];
+            }
+            //this.journals = shuffle(this.journals.slice())
           },
-          variant(klass) {
-            return klass.corrected ? 'success' : klass.predicted ? 'info' : ''
+          variant(klasses, klass) {
+            var anyCorrected = klasses.filter(k=>k.corrected).length > 0
+            return klass.corrected ? 'success' : !anyCorrected && klass.predicted ? 'info' : ''
           }
-        },
-        computed: {
         },
         created: function() {
           this.subjects = ["Soft matter", "Nanomaterial synthesis", "Semiconductor nanodevices", "Multiferroics", "Topological insulators", "High pressure physics", "Plasmonics Sensing", "Liquids", "Self assembled materials", "Electron transport in CMP", "Plasmonic metamaterials", "Computational Methods in CMP", "Spintronics" ].map(n => ({name: n, predicted: false, corrected: false}))
