@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 
-    <title>Article Transfer</title>
+    <title>Article Transfer: Decision support assistant</title>
 
     <!-- Required Stylesheets -->
     <link
@@ -19,6 +19,8 @@
       rel="stylesheet"
       href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"
     />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+      integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <style>
       .heading {padding: 1rem;}
     </style>
@@ -103,11 +105,12 @@
                 Recommended Journals
               </div>
               <div class="card-body">
-                <h5 class="card-title">Select the most appropriate journal and click confirm to submit your feedback.</h5>
-                <b-table striped hover :items="journals" selectable select-mode="single" selected-variant="success">
+                <b-table striped hover :items="journals" select-mode="single" selected-variant="success">
                 </b-table>
-                <b-button variant="success" v-on:click="stage = 'confirm'">Submit</b-button>
-                <b-button  v-on:click="stage = 'form'">Cancel</b-button>
+                <p>This list of journals is:</p>
+                <b-button variant="success" v-on:click="stage = 'confirm'"><i class="far fa-smile-beam"></i> Useful</b-button>
+                <b-button variant="danger" v-on:click="stage = 'confirm'"><i class="far fa-frown"></i> Not useful</b-button>
+                <b-button  v-on:click="stage = 'form'"><i class="far fa-meh"></i> Don't know</b-button>
               </div>
               </div>
             </div>
@@ -181,9 +184,9 @@
         },
         created: function() {
           this.subjects = ["Soft matter", "Nanomaterial synthesis", "Semiconductor nanodevices", "Multiferroics", "Topological insulators", "High pressure physics", "Plasmonics Sensing", "Liquids", "Self assembled materials", "Electron transport in CMP", "Plasmonic metamaterials", "Computational Methods in CMP", "Spintronics" ].map(n => ({name: n, predicted: false, corrected: false}))
-          this.subjects[0].predicted = true;
+          this.subjects[1].predicted = true;
           this.domains = ["Applied", "Theoretical"].map(n => ({ name: n, predicted: false, corrected: false }))
-          this.domains[1].predicted = true;
+          this.domains[0].predicted = true;
         }
       })
     </script>
